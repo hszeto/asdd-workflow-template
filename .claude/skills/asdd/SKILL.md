@@ -22,8 +22,8 @@ approved plan first. Two hard approval gates. Everything else follows from that.
    **Resolved Decisions** in the spec before planning begins. Never plan on
    assumed answers. Stop for approval.
 3. **Implement** in checkpoints. Pause on real ambiguity to ask rather than
-   guess. Commit at natural checkpoint boundaries rather than one giant diff
-   at the end.
+   guess. Size checkpoints as commit-sized units rather than one giant diff at
+   the end — but do not commit them; see Principles.
 4. **Self-Verify** — run tests, linter, and build/typecheck. Confirm what each
    command actually verifies rather than what it appears to; bundlers commonly
    strip types without checking them, so a green build is not a green
@@ -47,8 +47,14 @@ approved plan first. Two hard approval gates. Everything else follows from that.
   from spec/plan files — approval happens in conversation, not by editing a
   field in the doc. Resolved Decisions are not an exception: they record what
   was decided, not whether the doc is approved.
-- Prefer a feature branch even when working solo; skipping is only
-  acceptable for genuinely trivial one-line changes.
+- **Git is hands-off.** Never create or delete branches and never commit — no
+  `git checkout -b`, `git branch`, `git branch -d`, `git commit`, or `git push`.
+  Work on whatever branch is already checked out. If on branch `main`,
+  ask user if this is on purpose or need a new branch. Checkpoints are
+  commit-sized units of work, not commits to run: report each as ready and hand
+  over its message. The user runs every git write themselves.
+- A feature branch is worth preferring even when working solo, but creating it
+  is the user's call — suggest it, don't run it.
 - When exploring the codebase or researching an approach, do it dynamically
   at runtime (read the actual files) rather than relying on hardcoded
   assumptions about structure.

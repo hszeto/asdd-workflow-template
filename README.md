@@ -35,6 +35,10 @@ project needs its own variant (see below).
 Approval gates after steps 1 and 3 are non-negotiable. No implementation
 starts without sign-off on both the spec and the plan.
 
+**Git stays in your hands.** The workflow never creates or deletes branches and
+never commits — checkpoints are commit-sized units of work that get handed to you
+with a message, not commits Claude runs. `/commit-message` drafts; you commit.
+
 ## Where specs and plans live
 
 Both commands write into an `ai/` directory at the project root:
