@@ -39,15 +39,18 @@ improvising a different design.
 Check the current branch with `git branch --show-current`. This is read-only and
 fine to run.
 
-- **On `main` (or `master`)** — stop. Remind the user to create a branch, and
-  suggest a name derived from the plan's slug, e.g.
-  `feature/<plan-slug>`. Give them the exact command to run and wait for them to
-  confirm they have switched. Do not start implementing on the default branch.
+- **On `main` (or `master`)** — stop. Remind the user to create a branch and
+  suggest the plan's slug verbatim as the name — no `feature/` prefix; the
+  branch, the spec filename and the plan filename all share one identifier.
+  Give them the exact command to run and wait for them to confirm they have
+  switched. Do not start implementing on the default branch.
 - **On a branch whose name has no evident relationship to this plan** — stop and
   ask whether it is the right branch before proceeding. An unrelated branch name
   usually means leftover state from other work, and mixing this feature into it
   is hard to unpick afterwards.
-- **On a branch that plainly matches the plan** — proceed without asking.
+- **On a branch matching the plan's slug** — proceed without asking. A branch
+  carrying a prefix or minor variation of the slug still counts as matching;
+  only genuinely unrelated names warrant the question above.
 
 **Never create, rename, delete or switch a branch.** Suggest the command and let
 the user run it. This holds even when the user has just agreed a branch is
