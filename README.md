@@ -11,6 +11,7 @@ project needs its own variant (see below).
 ├── commands/
 │   ├── feature-spec.md      # Phase 0 + 1 — orient, then write a spec
 │   ├── feature-plan.md      # Phase 2 — research, then write a plan
+│   ├── feature-implement.md # Phases 3-6 — build it, one checkpoint at a time
 │   └── commit-message.md    # Phase 7 — commit message, summary, PR description
 └── skills/asdd/SKILL.md     # phase structure + principles, loaded automatically
 ```
@@ -25,7 +26,8 @@ project needs its own variant (see below).
 3. `/feature-plan <name>` → promotes those answers to **Resolved Decisions** in
    the spec, then writes `ai/plans/<name>.md`. Refuses to plan on assumed
    answers. **Stop for approval.**
-4. Implement in checkpoints — pause on real ambiguity, don't guess.
+4. `/feature-implement <name>` → builds it **one checkpoint at a time**, stopping
+   after each so you can commit before the next begins.
 5. Self-verify — tests, lint, build must be green (or explicitly note what
    tooling doesn't exist).
 6. Update changelog always; README/API docs if user- or API-facing.
@@ -35,9 +37,12 @@ project needs its own variant (see below).
 Approval gates after steps 1 and 3 are non-negotiable. No implementation
 starts without sign-off on both the spec and the plan.
 
-**Git stays in your hands.** The workflow never creates or deletes branches and
-never commits — checkpoints are commit-sized units of work that get handed to you
-with a message, not commits Claude runs. `/commit-message` drafts; you commit.
+**Git stays in your hands.** The workflow never creates, switches or deletes
+branches and never commits — checkpoints are commit-sized units of work that get
+handed to you with a message, not commits Claude runs. Before writing any code,
+`/feature-implement` checks the branch: on `main` it stops and suggests a branch
+name for you to create, and on a branch that looks unrelated to the plan it asks
+first. `/commit-message` drafts; you commit.
 
 ## Where specs and plans live
 
@@ -97,7 +102,7 @@ a customized variant — multi-repo layouts being the main case.
      instead of a bare `git diff`
    - See the fengshui-shifu project's `.claude/` for a worked multi-repo example.
 6. Restart Claude Code and run `/help` to confirm `/feature-spec`,
-   `/feature-plan`, and `/commit-message` all appear.
+   `/feature-plan`, `/feature-implement`, and `/commit-message` all appear.
 
 ## Naming gotchas (learned the hard way)
 

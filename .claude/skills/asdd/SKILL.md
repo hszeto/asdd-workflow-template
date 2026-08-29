@@ -1,6 +1,6 @@
 ---
 name: asdd
-description: AI Spec Driven Development workflow for this project. Use whenever the user invokes /feature-spec, /feature-plan, or /commit-message, or asks to build a feature "the spec-driven way." Governs the phase structure — Orient, Feature Spec, Plan, Implement, Self-Verify, Docs & Changelog, Manual Test, Summary & Handoff.
+description: AI Spec Driven Development workflow for this project. Use whenever the user invokes /feature-spec, /feature-plan, /feature-implement, or /commit-message, or asks to build a feature "the spec-driven way." Governs the phase structure — Orient, Feature Spec, Plan, Implement, Self-Verify, Docs & Changelog, Manual Test, Summary & Handoff.
 user-invocable: false
 ---
 
@@ -21,9 +21,12 @@ approved plan first. Two hard approval gates. Everything else follows from that.
    answered first — in the spec file or in conversation — and are promoted to
    **Resolved Decisions** in the spec before planning begins. Never plan on
    assumed answers. Stop for approval.
-3. **Implement** in checkpoints. Pause on real ambiguity to ask rather than
-   guess. Size checkpoints as commit-sized units rather than one giant diff at
-   the end — but do not commit them; see Principles.
+3. **Implement** (via `/feature-implement`) in checkpoints, **one at a time** —
+   verify a checkpoint, report it with its commit message, then stop and wait
+   for the user to commit before starting the next. Running checkpoints
+   back-to-back leaves both sets of changes in one working tree and destroys the
+   split. Pause on real ambiguity to ask rather than guess. Do not commit; see
+   Principles.
 4. **Self-Verify** — run tests, linter, and build/typecheck. Confirm what each
    command actually verifies rather than what it appears to; bundlers commonly
    strip types without checking them, so a green build is not a green
@@ -47,12 +50,15 @@ approved plan first. Two hard approval gates. Everything else follows from that.
   from spec/plan files — approval happens in conversation, not by editing a
   field in the doc. Resolved Decisions are not an exception: they record what
   was decided, not whether the doc is approved.
-- **Git is hands-off.** Never create or delete branches and never commit — no
-  `git checkout -b`, `git branch`, `git branch -d`, `git commit`, or `git push`.
-  Work on whatever branch is already checked out. If on branch `main`,
-  ask user if this is on purpose or need a new branch. Checkpoints are
-  commit-sized units of work, not commits to run: report each as ready and hand
-  over its message. The user runs every git write themselves.
+- **Git is hands-off.** Never create, switch, rename or delete branches, and
+  never commit — no `git checkout`, `git checkout -b`, `git branch`,
+  `git branch -d`, `git commit`, or `git push`. Reading state (`git status`,
+  `git diff`, `git branch --show-current`) is fine. Work on whatever branch is
+  already checked out. If on `main`, ask whether that is on purpose or a branch
+  is wanted, and suggest a name — but let the user create it; agreeing a branch
+  should exist is not permission to create it. Checkpoints are commit-sized
+  units of work, not commits to run: report each as ready and hand over its
+  message. The user runs every git write themselves.
 - A feature branch is worth preferring even when working solo, but creating it
   is the user's call — suggest it, don't run it.
 - When exploring the codebase or researching an approach, do it dynamically
