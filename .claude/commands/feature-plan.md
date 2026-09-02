@@ -1,5 +1,6 @@
 ---
 description: Phase 2 of ASDD — research and write an implementation plan for an approved feature spec.
+argument-hint: feature-spec md file
 ---
 
 # /feature-plan $ARGUMENTS

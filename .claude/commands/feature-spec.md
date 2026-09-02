@@ -1,5 +1,6 @@
 ---
 description: Phase 0 + Phase 1 of ASDD — orient in the codebase, then write a feature spec for approval.
+argument-hint: Feature description
 ---
 
 # /feature-spec $ARGUMENTS
