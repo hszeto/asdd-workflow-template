@@ -56,7 +56,7 @@ Use this template:
 - <path> — <what changes>
 
 ## Checkpoints
-1. <one commit-sized unit of work, one line>
+1. <one commit-sized unit of work> → verify: <the check that proves it done>
 2. ...
 
 ## Test Plan

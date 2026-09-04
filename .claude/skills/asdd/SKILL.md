@@ -64,6 +64,11 @@ approved plan first. Two hard approval gates. Everything else follows from that.
   should exist is not permission to create it. Checkpoints are commit-sized
   units of work, not commits to run: report each as ready and hand over its
   message. The user runs every git write themselves.
+- **Checkpoints bound scope, not just timing.** Every changed line in a
+  checkpoint should trace to its plan entry. Don't improve adjacent code,
+  reformat, or refactor what isn't broken along the way — that noise is what
+  makes a checkpoint impossible to review or revert cleanly. See `CLAUDE.md`
+  for the full behavioral rules.
 - A feature branch is worth preferring even when working solo, but creating it
   is the user's call — suggest it, don't run it.
 - When exploring the codebase or researching an approach, do it dynamically
