@@ -33,9 +33,10 @@ approved plan first. Two hard approval gates. Everything else follows from that.
    typecheck. Must be green before moving on. If any of these don't exist in
    this project, say so explicitly in the plan's Test Plan section rather than
    silently skipping verification.
-5. **Docs & Changelog** — update README/API docs if the change is user- or
-   API-facing. Add a changelog entry every time, regardless of whether docs
-   changed.
+5. **Docs & Changelog** — update docs that exist; never create one unasked.
+   README/API docs get updated when the change is user- or API-facing. If the
+   repo has none, ask whether to start one — "no" is a fine answer. A changelog
+   gets an entry when the repo keeps one, and is skipped when it doesn't.
 6. **Manual Test Instructions** — concrete, copy-pasteable steps to see the
    feature working.
 7. **Summary & Handoff** — summary, and hand off to `/commit-message` for the

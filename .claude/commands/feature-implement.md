@@ -85,9 +85,17 @@ it.
 
 ## 5. Docs & Changelog (Phase 5) — after the last checkpoint
 
-Update README/API docs if the change is user- or API-facing. Add a changelog
-entry. If no changelog file exists yet, do not invent the convention silently —
-ask whether to start one.
+Update the documentation the repo already has. Never create a documentation
+file without being asked.
+
+- **README / API docs** — update when the change is user- or API-facing and the
+  files exist. If the repo has none, ask whether to start one. Ask it as a
+  genuine question: plenty of repos are deliberately fine without, and "no" is
+  a normal answer. Wait for it — do not draft the file while asking.
+- **Changelog** — when the repo keeps one, add an entry matching its existing
+  format. No changelog file means skip it silently; do not invent a convention.
+
+Say in the handover what you updated and what you skipped.
 
 ## 6. Manual Test Instructions (Phase 6)
 

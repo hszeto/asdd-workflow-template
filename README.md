@@ -102,7 +102,9 @@ two approval gates, and one per checkpoint for the commit.
    after each so you can commit before the next begins.
 5. Self-verify — tests, lint, build must be green (or explicitly note what
    tooling doesn't exist).
-6. Update changelog always; README/API docs if user- or API-facing.
+6. Update whatever docs the repo already has — a changelog entry if it keeps
+   one, README/API docs if the change is user- or API-facing. If it has no
+   README/API docs, ask whether to start one. Never create docs unasked.
 7. Give manual test instructions.
 8. `/commit-message` → commit message, summary, PR description.
 
