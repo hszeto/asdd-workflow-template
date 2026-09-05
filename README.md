@@ -54,7 +54,8 @@ confusing.
 ```
 ~/.claude/CLAUDE.md        (if installed globally)
   └─ ./CLAUDE.md and/or ./.claude/CLAUDE.md   ← behavioral rules, always in context
-     └─ .claude/settings.json                 ← hooks registered, not read as text
+     └─ ~/.claude/settings.json + ./.claude/settings.json
+                                              ← hooks registered, not read as text
         └─ skill + command descriptions       ← names only; bodies load on demand
 ```
 
@@ -142,12 +143,28 @@ mkdir -p ~/.claude/commands ~/.claude/skills
 cp .claude/commands/*.md ~/.claude/commands/
 cp -r .claude/skills/asdd ~/.claude/skills/
 cp .claude/CLAUDE.md ~/.claude/CLAUDE.md   # skip if you already have one — merge instead
+
+# settings.json merges, it does not copy — see below
+cp ~/.claude/settings.json ~/.claude/settings.json.bak 2>/dev/null || echo '{}' > ~/.claude/settings.json.bak
+jq -s '.[0] * .[1]' ~/.claude/settings.json.bak .claude/settings.json > ~/.claude/settings.json
 ```
 
-`settings.json` is deliberately **not** copied globally. Hooks in
-`~/.claude/settings.json` run in every project on the machine, including ones
-where a `main`-branch warning is just noise. Copy it per project instead, into
-that project's `.claude/settings.json`.
+**`settings.json` merges rather than copies.** You almost certainly already
+have a `~/.claude/settings.json` holding things like `model` and `tui`. A plain
+`cp` replaces that file wholesale and those settings are gone — `cp` knows
+nothing about JSON. `jq -s '.[0] * .[1]'` combines the two objects instead,
+with the right-hand file winning on any shared key.
+
+It reads from `.bak` rather than the live file because the shell creates the
+`>` output file *before* `jq` runs, emptying the very file being read. The
+`.bak` sidesteps that and doubles as your undo.
+
+Installed globally, the branch hook fires in **every** repo on the machine,
+including ones where working on `main` is deliberate. That is the intent: it
+warns, it never blocks, so a wrong guess costs one line of output and a
+question you can wave off. To scope it more tightly, drop the two `jq` lines
+above and copy the file into individual projects' `.claude/settings.json`
+instead.
 
 `~/.claude/CLAUDE.md` is global memory: it applies to every project on the
 machine, ASDD-driven or not. If you already have one, merge rather than

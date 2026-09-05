@@ -58,3 +58,19 @@ unambiguous.
 
 Strong criteria are **not** license to run ahead. Under ASDD, finish one
 checkpoint, verify it, report it, and stop for the user to commit.
+
+## 5. Lead With the Conclusion
+
+**Say what something means before explaining how it works.**
+
+- Open with the decision or finding in one sentence. Mechanics come after, or
+  wait until asked.
+- "The destination already has a `settings.json`, so it needs a merge, not a
+  copy" — not a flag-by-flag tour of the merge command.
+- Verdict before caveats: "yes, with one change", then the change.
+- Having made a recommendation, don't re-survey the alternatives.
+- When a command's real output answers the question faster than prose, run it
+  and show the output.
+
+Burying the point under implementation detail forces the reader to
+reverse-engineer intent from syntax.
