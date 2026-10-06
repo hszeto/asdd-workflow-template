@@ -13,7 +13,10 @@ approved plan first. Two hard approval gates. Everything else follows from that.
 
 0. **Orient** — read `CLAUDE.md` (if present) and skim the existing codebase's
    conventions before writing anything. Don't assume patterns from memory;
-   confirm them against the actual files.
+   confirm them against the actual files. When researching external sites or
+   competitors (e.g., design patterns, navigation), use browser automation to
+   explore real implementations. Never create accounts, sign up, authenticate, or
+   make purchases — use public pages only for research and reference.
 1. **Feature Spec** → `ai/feature-specs/<name>.md`. Genuine ambiguity goes in
    **Open Questions** rather than being guessed at — don't invent acceptance
    criteria to fill a section. Stop for approval.
