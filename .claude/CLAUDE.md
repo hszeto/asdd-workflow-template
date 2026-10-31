@@ -4,8 +4,6 @@ Behavioral guidelines to reduce common LLM coding mistakes. These govern *how*
 code gets written; the `asdd` skill governs *what order* and *which gates*.
 Merge with project-specific instructions as needed.
 
-Adapted from https://github.com/multica-ai/andrej-karpathy-skills.
-
 **Tradeoff:** these bias toward caution over speed. For trivial tasks, use
 judgment — but ASDD's approval gates are not the trivial case, and are never
 skipped.
@@ -23,6 +21,7 @@ skipped.
 
 **Minimum code that solves the problem. Nothing speculative.**
 
+- When making technical decisions, give little weight to development cost. Prioritize quality, simplicity, robustness, scalability, and long-term maintainability.
 - No features beyond what was asked.
 - No abstractions for single-use code.
 - No "flexibility" or "configurability" that wasn't requested.
