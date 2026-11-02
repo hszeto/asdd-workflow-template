@@ -19,11 +19,11 @@ approved plan first. Two hard approval gates. Everything else follows from that.
    make purchases — use public pages only for research and reference.
 1. **Feature Spec** → `ai/feature-specs/<name>.md`. Genuine ambiguity goes in
    **Open Questions** rather than being guessed at — don't invent acceptance
-   criteria to fill a section. Stop for approval.
+   criteria to fill a section. Stop for approval via the review page.
 2. **Plan** (via `/feature-plan`) → `ai/plans/<name>.md`. Open Questions must be
-   answered first — in the spec file or in conversation — and are promoted to
+   answered first — on the review page or in the file — and are promoted to
    **Resolved Decisions** in the spec before planning begins. Never plan on
-   assumed answers. Stop for approval.
+   assumed answers. Stop for approval via the review page.
 3. **Implement** (via `/feature-implement`) in checkpoints, **one at a time** —
    verify a checkpoint, report it with its commit message, then stop and wait
    for the user to commit before starting the next. Running checkpoints
@@ -45,6 +45,29 @@ approved plan first. Two hard approval gates. Everything else follows from that.
 7. **Summary & Handoff** — summary, and hand off to `/commit-message` for the
    actual commit message and PR description.
 
+## Review page
+
+Spec and plan files are reviewed in the browser, not in chat. The markdown is
+the record; the page is the view. The script is `.claude/scripts/review.py`
+in a project, or `~/.claude/scripts/review.py` for a global install. It uses
+only the Python standard library.
+
+1. **Render:** `python3 .claude/scripts/review.py render ai/<dir>/<name>.md`
+   writes the `.html` next to it.
+2. **Serve:** run `python3 .claude/scripts/review.py serve ai/<dir>/<name>.html --once`
+   in the background (`run_in_background`). Tell the user the URL
+   (`http://127.0.0.1:8765/`) in one line. The command exits after the first
+   save, which notifies you.
+3. **Apply:** when the server exits, run `python3 .claude/scripts/review.py apply
+   ai/<dir>/<name>.md`. This writes answers into the markdown as
+   `  - Answer: ...` lines under each question, ticks any checked approval
+   boxes, deletes the answers file, and re-renders the page.
+4. **Next round:** if there are still open questions, say so in one line and
+   start step 2 again. Otherwise report what changed.
+
+Answers are written under the question they answer, so the markdown stays the
+single record. Don't edit the `.html` or `.answers.json` by hand.
+
 ## Principles
 
 - **Write short.** Spec and plan files are working documents someone has to
@@ -56,9 +79,10 @@ approved plan first. Two hard approval gates. Everything else follows from that.
   implementation never begins without explicit sign-off on both the spec and
   the plan.
 - Status headers (e.g. "Status: Draft/Approved") are intentionally excluded
-  from spec/plan files — approval happens in conversation, not by editing a
-  field in the doc. Resolved Decisions are not an exception: they record what
-  was decided, not whether the doc is approved.
+  from spec/plan files. Approval is the one checkbox under `## Approval`
+  ("Spec approved" / "Plan approved"), ticked on the review page. Resolved
+  Decisions are not an exception: they record what was decided, not whether
+  the doc is approved.
 - **Git is hands-off.** Never create, switch, rename or delete branches, and
   never commit — no `git checkout`, `git checkout -b`, `git branch`,
   `git branch -d`, `git commit`, or `git push`. Reading state (`git status`,

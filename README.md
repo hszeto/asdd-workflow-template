@@ -15,6 +15,7 @@ project needs its own variant (see below).
 │   ├── feature-plan.md      # Phase 2 — research, then write a plan
 │   ├── feature-implement.md # Phases 3-6 — build it, one checkpoint at a time
 │   └── commit-message.md    # Phase 7 — commit message, summary, PR description
+├── scripts/review.py        # renders spec/plan as an HTML review page, saves answers
 └── skills/asdd/SKILL.md     # phase structure + principles
 ```
 
@@ -68,13 +69,16 @@ deliberate — it keeps startup context small.
 ```
 /feature-spec <req>   → loads SKILL.md + feature-spec.md
                       → reads CLAUDE.md context already in scope
-                      → writes ai/feature-specs/<name>.md          ⏸ APPROVAL
+                      → writes ai/feature-specs/<name>.md + .html
+                      → starts the review server, prints the URL   ⏸ APPROVAL
 
-  you answer Open Questions (in the file, or in chat)
+  you answer Open Questions and tick "Spec approved" on the page
+  Claude folds the answers into the markdown and re-renders the page
 
 /feature-plan <name>  → re-reads the spec, promotes answers to
                         Resolved Decisions, researches the code
-                      → writes ai/plans/<name>.md                  ⏸ APPROVAL
+                      → writes ai/plans/<name>.md + .html
+                      → starts the review server, prints the URL   ⏸ APPROVAL
 
 /feature-implement    → checks the branch (hook also fires on first edit)
                       → checkpoint 1 → verify → report → ⏸ you commit
@@ -91,13 +95,14 @@ two approval gates, and one per checkpoint for the commit.
 ## The workflow
 
 1. `/feature-spec <requirement>` → writes `ai/feature-specs/<name>.md`, parking
-   any genuine ambiguity in **Open Questions** rather than guessing at it.
-   **Stop for approval.**
-2. Answer the Open Questions — inline in the spec file, or in chat. The file is
-   the better record; `/feature-plan` re-reads it either way.
+   any genuine ambiguity in **Open Questions** rather than guessing at it, and
+   opens the review page. **Stop for approval.**
+2. On the review page, answer the Open Questions and tick **Spec approved**,
+   then click Save. Claude folds the answers into the markdown under each
+   question and re-renders the page.
 3. `/feature-plan <name>` → promotes those answers to **Resolved Decisions** in
-   the spec, then writes `ai/plans/<name>.md`. Refuses to plan on assumed
-   answers. **Stop for approval.**
+   the spec, then writes `ai/plans/<name>.md` and opens its review page. Refuses
+   to plan on assumed answers or an unticked spec. **Stop for approval.**
 4. `/feature-implement <name>` → builds it **one checkpoint at a time**, stopping
    after each so you can commit before the next begins.
 5. Self-verify — tests, lint, build must be green (or explicitly note what
@@ -128,10 +133,26 @@ ai/
 └── plans/<name>.md           # how, files touched, checkpoints, test plan, risks
 ```
 
-**Commit these.** They're the durable record of what was decided and why —
-the part that survives a lost session and explains the diff six months later.
-Don't gitignore them. Slugs match between the two directories, so a spec and
-its plan always share a filename.
+**Commit the `.md` files.** They're the durable record of what was decided and
+why — the part that survives a lost session and explains the diff six months
+later. Slugs match between the two directories, so a spec and its plan always
+share a filename.
+
+The `.html` review pages and `.answers.json` files are generated and local, so
+`.gitignore` excludes them. Regenerate a page with `render` at any time.
+
+## The review page
+
+Specs and plans open as a simple HTML page with text boxes for Open Questions
+and checkboxes for approval. Start it from the spec or plan command, and it
+runs on `127.0.0.1:8765` only. Nothing leaves the machine.
+
+When you click **Save answers**, the server writes `<name>.answers.json` and
+exits. Claude then runs `apply`, which writes the answers into the markdown and
+re-renders the page. Answers are never kept only in the browser.
+
+Running `review.py serve` by hand, outside a command, works the same way.
+Requires Python 3 and no packages.
 
 ## Installing
 
@@ -144,6 +165,7 @@ no per-project setup:
 mkdir -p ~/.claude/commands ~/.claude/skills
 cp .claude/commands/*.md ~/.claude/commands/
 cp -r .claude/skills/asdd ~/.claude/skills/
+mkdir -p ~/.claude/scripts && cp .claude/scripts/review.py ~/.claude/scripts/
 cp .claude/CLAUDE.md ~/.claude/CLAUDE.md   # skip if you already have one — merge instead
 
 # settings.json merges, it does not copy — see below
