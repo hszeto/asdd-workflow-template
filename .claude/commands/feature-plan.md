@@ -13,12 +13,13 @@ only. Do not begin implementation.
 `$ARGUMENTS` is a feature name or note identifying which spec to plan for.
 Search `ai/feature-specs/` for a matching file.
 
-If no matching approved spec exists, stop and tell the user — do not plan from
-an unapproved or invented spec.
+If no matching spec exists, or its **Spec approved** box under `## Approval` is
+not ticked, stop and tell the user — do not plan from an unapproved or invented
+spec.
 
-Before planning, re-read the spec's **Open Questions** — every spec, if the
-feature spans more than one. If any are unanswered — in the file and in this
-conversation — stop and ask. Do not plan on assumed answers.
+Before planning, re-read the spec's **Open Questions**. If any are unanswered —
+in the file and in this conversation — stop and ask. Do not plan on assumed
+answers.
 
 Once answered, promote the section to **Resolved Decisions**: restate each as
 the decision made, keeping the rationale, and confirm none remain open. Editing
@@ -33,7 +34,8 @@ test/lint/build tooling actually exists in this project before assuming it.
 
 ## 3. Write the plan
 
-Write to `ai/plans/<name>.md`, matching the spec's slug.
+Write to `ai/plans/<name>.md`, matching the spec's slug. In a workspace folder,
+put the plan in the same `ai/` as its spec, and give each checkpoint its repo.
 
 **Keep it scannable.** Bullets, not paragraphs. One line per bullet — if a
 design decision needs more, state the decision in one line and the reason in
@@ -65,9 +67,19 @@ Use this template:
 
 ## Risks / Rollback
 - <risk> → <mitigation or how to undo>
+
+## Approval
+- [ ] Plan approved
 ```
 
-## 4. Stop
+## 4. Review page
 
-After writing the file(s), stop and wait for approval. Do not begin
-implementation until the user explicitly approves the plan.
+Follow the **Review page** steps in the `asdd` skill for `ai/plans/<name>.md`.
+Keep the chat reply short: the plan path, the review URL, and any open
+questions.
+
+## 5. Stop
+
+Wait for the review server to finish, then run the apply step from the `asdd`
+skill and summarize what changed. Do not begin implementation until **Plan
+approved** is ticked.

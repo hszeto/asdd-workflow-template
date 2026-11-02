@@ -21,6 +21,12 @@ Requirement: "$ARGUMENTS"
 Write the spec to `ai/feature-specs/<name>.md`, where `<name>` is a short
 kebab-case slug derived from the requirement.
 
+**Choose the folder first.** If this folder holds other git repos (a workspace
+rather than a single repo), ask which repo or repos the feature touches. One
+repo: write to `<repo>/ai/feature-specs/`. Two or more: write to this folder's
+`ai/feature-specs/` and name the repo for each checkpoint in the plan. A
+single-repo folder always writes to its own `ai/`.
+
 **Keep it scannable.** Bullets, not paragraphs. One line per bullet. A whole
 spec should fit on one screen — if it doesn't, the feature is too big to spec
 in one file. Omit any section that would be empty; don't pad it with filler.
@@ -45,21 +51,21 @@ Use this template:
 ## Acceptance Criteria
 - <one line each, checkable as done/not done>
 
-## Open Questions
-- <question — one line, answerable without a paragraph back>
+## Approval
+- [ ] Spec approved
 ```
 
 If you have genuine ambiguity about requirements, put it in **Open Questions**
 rather than guessing — do not invent acceptance criteria to fill the section.
 
-Tell the user they can answer inline in the spec file, directly under each
-question, or in chat. The spec file is preferred — it's the durable record and
-survives a lost session. `/feature-plan` re-reads it before planning, so answers
-left there will be picked up; mentioning it in chat is still helpful if you want
-them acted on sooner.
+## 3. Review page
 
-## 3. Stop
+Follow the **Review page** steps in the `asdd` skill: render the page, then start
+the review server in the background. Keep the chat reply short: the spec path,
+the review URL, and the Open Questions count. Do not paste the spec into chat.
 
-After writing the file(s), stop. Tell the user the path(s) and summarize the
-Open Questions (if any). Do not run `/feature-plan` automatically — wait for
-explicit approval.
+## 4. Stop
+
+Wait for the review server to finish. When it does, run the apply step from the
+`asdd` skill, then summarize what changed and what is still open. Do not run
+`/feature-plan` automatically — it runs only after **Spec approved** is ticked.
