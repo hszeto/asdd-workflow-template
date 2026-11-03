@@ -43,14 +43,13 @@ textarea{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px so
 
 JS = """
 document.getElementById('save').addEventListener('click', async () => {
-  const questions = {}, gates = {};
+  const questions = {};
   document.querySelectorAll('textarea[data-id]').forEach(t => questions[t.dataset.id] = t.value.trim());
-  document.querySelectorAll('input[data-id]').forEach(c => gates[c.dataset.id] = c.checked);
   const statusEl = document.getElementById('status');
   statusEl.textContent = 'Saving...';
   try {
     const r = await fetch('/submit', {method: 'POST', headers: {'Content-Type': 'application/json'},
-                                      body: JSON.stringify({questions, gates})});
+                                      body: JSON.stringify({questions})});
     statusEl.textContent = r.ok ? 'Saved. Go back to Claude Code.' : 'Save failed (' + r.status + ').';
   } catch (e) {
     statusEl.textContent = 'Save failed. Is the review server still running?';
@@ -68,7 +67,7 @@ def inline(text):
 def parse(lines):
     """Return blocks in document order. Each block records its source line index."""
     blocks, section, in_code, code = [], None, False, []
-    qn = gn = 0
+    qn = 0
     i = 0
     while i < len(lines):
         line = lines[i]
@@ -93,8 +92,8 @@ def parse(lines):
             i += 1
             continue
         if m := CHECK_RE.match(line):
-            gn += 1
-            blocks.append(("gate", f"G{gn}", m.group(3), m.group(2).lower() == "x", i))
+            mark = "☑" if m.group(2).lower() == "x" else "☐"
+            blocks.append(("li", f"{mark} {m.group(3)}"))
             i += 1
             continue
         if m := BULLET_RE.match(line):
@@ -136,15 +135,6 @@ def render_page(md_text, title_fallback):
         if kind == "li":
             open_ul()
             out.append(f"<li>{inline(b[1])}</li>")
-            continue
-        if kind == "gate":
-            open_ul()
-            _, gid, text, checked, _ = b
-            mark = " checked" if checked else ""
-            out.append(
-                f'<li class="gate"><label><input type="checkbox" data-id="{gid}"{mark}>'
-                f"{inline(text)}</label></li>"
-            )
             continue
         close_ul()
         if kind == "h":
@@ -209,14 +199,12 @@ class ReviewHandler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
             questions = {k: str(v)[:MAX_ANSWER] for k, v in data["questions"].items()
                          if re.fullmatch(r"Q\d+", k)}
-            gates = {k: bool(v) for k, v in data["gates"].items() if re.fullmatch(r"G\d+", k)}
         except (KeyError, TypeError, ValueError):
             self.send_error(400)
             return
         payload = {
             "submitted_at": datetime.datetime.now().isoformat(timespec="seconds"),
             "questions": questions,
-            "gates": gates,
         }
         self.server.answers_path.write_text(json.dumps(payload, indent=2))
         body = b'{"ok": true}'
@@ -263,12 +251,6 @@ def cmd_apply(md_arg):
                 edits.append((ans_idx if ans_idx is not None else idx, "set", line, ans_idx is None))
             elif ans_idx is not None:
                 edits.append((ans_idx, "delete", None, False))
-        elif b[0] == "gate":
-            _, gid, _, _, idx = b
-            if gid in saved["gates"]:
-                mark = "x" if saved["gates"][gid] else " "
-                line = re.sub(r"\[( |x|X)\]", f"[{mark}]", lines[idx], count=1)
-                edits.append((idx, "set", line, False))
     for idx, action, line, insert in sorted(edits, key=lambda e: e[0], reverse=True):
         if action == "delete":
             del lines[idx]

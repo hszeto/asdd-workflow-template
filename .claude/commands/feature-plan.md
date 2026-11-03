@@ -13,9 +13,8 @@ only. Do not begin implementation.
 `$ARGUMENTS` is a feature name or note identifying which spec to plan for.
 Search `ai/feature-specs/` for a matching file.
 
-If no matching spec exists, or its **Spec approved** box under `## Approval` is
-not ticked, stop and tell the user — do not plan from an unapproved or invented
-spec.
+If no matching spec exists, stop and tell the user — do not plan from an
+invented spec.
 
 Before planning, re-read the spec's **Open Questions**. If any are unanswered —
 in the file and in this conversation — stop and ask. Do not plan on assumed
@@ -58,8 +57,11 @@ Use this template:
 - <path> — <what changes>
 
 ## Checkpoints
-1. <one commit-sized unit of work> → verify: <the check that proves it done>
-2. ...
+- [ ] 1. <one commit-sized unit of work> → verify: <the check that proves it done>
+- [ ] 2. ...
+
+Write every checkpoint unticked. `/feature-implement` ticks each one after the
+user confirms its commit.
 
 ## Test Plan
 - <specific test/case to add or run>
@@ -67,9 +69,6 @@ Use this template:
 
 ## Risks / Rollback
 - <risk> → <mitigation or how to undo>
-
-## Approval
-- [ ] Plan approved
 ```
 
 ## 4. Review page
@@ -81,5 +80,5 @@ questions.
 ## 5. Stop
 
 Wait for the review server to finish, then run the apply step from the `asdd`
-skill and summarize what changed. Do not begin implementation until **Plan
-approved** is ticked.
+skill and summarize what changed. Do not begin implementation until the user
+runs `/feature-implement`.
