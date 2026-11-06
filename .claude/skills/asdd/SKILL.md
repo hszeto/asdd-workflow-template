@@ -31,6 +31,12 @@ from that.
    back-to-back leaves both sets of changes in one working tree and destroys the
    split. Pause on real ambiguity to ask rather than guess. Do not commit; see
    Principles.
+3a. **Review (optional)** — via `/feature-implementation-review`, after
+   Implement. Reviews the whole branch diff against the spec, plan, and contract,
+   and opens a review page of findings. Never fixes code; accepted fixes go back
+   through Implement as new checkpoints. Skip it for small changes. The review
+   runs in a subagent on a higher-grade model (Opus); the main session keeps its
+   own model.
 4. **Self-Verify** — run tests, linter, and build/typecheck. Confirm what each
    command actually verifies rather than what it appears to; bundlers commonly
    strip types without checking them, so a green build is not a green
@@ -49,17 +55,17 @@ from that.
 ## Review page
 
 Spec and plan files are reviewed in the browser, not in chat. The markdown is
-the record; the page is the view. The script is `.claude/scripts/review.py`
-in a project, or `~/.claude/scripts/review.py` for a global install. It uses
-only the Python standard library.
+the record; the page is the view. Resolve the script first: `REVIEW` is
+`.claude/scripts/review.py` if this project has it, otherwise
+`~/.claude/scripts/review.py`. It uses only the Python standard library.
 
-1. **Render:** `python3 .claude/scripts/review.py render ai/<dir>/<name>.md`
+1. **Render:** `python3 $REVIEW render ai/<dir>/<name>.md`
    writes the `.html` next to it.
-2. **Serve:** run `python3 .claude/scripts/review.py serve ai/<dir>/<name>.html --once`
+2. **Serve:** run `python3 $REVIEW serve ai/<dir>/<name>.html --once`
    in the background (`run_in_background`). Tell the user the URL
    (`http://127.0.0.1:8765/`) in one line. The command exits after the first
    save, which notifies you.
-3. **Apply:** when the server exits, run `python3 .claude/scripts/review.py apply
+3. **Apply:** when the server exits, run `python3 $REVIEW apply
    ai/<dir>/<name>.md`. This writes answers into the markdown as
    `  - Answer: ...` lines under each question, deletes the answers file, and
    re-renders the page.

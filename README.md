@@ -14,6 +14,7 @@ project needs its own variant (see below).
 │   ├── feature-spec.md      # Phase 0 + 1 — orient, then write a spec
 │   ├── feature-plan.md      # Phase 2 — research, then write a plan
 │   ├── feature-implement.md # Phases 3-6 — build it, one checkpoint at a time
+│   ├── feature-implementation-review.md # optional — review the whole feature diff
 │   └── commit-message.md    # Phase 7 — commit message, summary, PR description
 ├── scripts/review.py        # renders spec/plan as an HTML review page, saves answers
 └── skills/asdd/SKILL.md     # phase structure + principles
@@ -104,6 +105,11 @@ next command, and committing each checkpoint.
    to plan while any question is unanswered. Running it is your go-ahead.
 4. `/feature-implement <name>` → builds it **one checkpoint at a time**, stopping
    after each so you can commit before the next begins.
+   - Optional: `/feature-implementation-review <name>` → reviews the whole feature
+     diff against the spec, plan, and contract, and opens a review page of findings
+     you mark `fix` or `skip`. It needs at least one ticked checkpoint, and it
+     doesn't make any fixes. The review itself runs in a subagent on a higher-grade
+     model (Opus), so your main session stays on its own, cheaper model.
 5. Self-verify — tests, lint, build must be green (or explicitly note what
    tooling doesn't exist).
 6. Update whatever docs the repo already has — a changelog entry if it keeps

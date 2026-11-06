@@ -17,7 +17,7 @@ from pathlib import Path
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-OPEN_QUESTIONS = "Open Questions"
+ANSWERABLE_SECTIONS = ("Open Questions", "Findings")
 MAX_ANSWER = 20000
 
 CHECK_RE = re.compile(r"^(\s*)- \[( |x|X)\] (.*)$")
@@ -36,8 +36,8 @@ pre{background:#f0f0f0;padding:12px;overflow-x:auto;border-radius:6px}
 .q{margin:14px 0;padding:12px;background:#fff;border:1px solid #e3e3e3;border-radius:8px}
 .q p{margin:0 0 8px;font-weight:600}
 textarea{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid #ccc;border-radius:6px;min-height:3em}
-.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px;background:#fff;border-top:1px solid #ddd}
-.bar button{font:inherit;padding:10px 18px;border-radius:6px;border:0;background:#1d1d1f;color:#fff;cursor:pointer}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px;background:#fff;border-top:1px solid #ddd;text-align:center}
+.bar button{font:inherit;font-weight:600;padding:10px 18px;border-radius:6px;border:0;background:#c62828;color:#fff;cursor:pointer}
 #status{margin-left:12px;color:#555}
 """
 
@@ -97,7 +97,7 @@ def parse(lines):
             i += 1
             continue
         if m := BULLET_RE.match(line):
-            if not m.group(1) and section == OPEN_QUESTIONS:
+            if not m.group(1) and section in ANSWERABLE_SECTIONS:
                 qn += 1
                 ans_idx, answer = None, ""
                 if i + 1 < len(lines) and (a := ANSWER_RE.match(lines[i + 1])):
@@ -158,7 +158,7 @@ def render_page(md_text, title_fallback):
 <title>{html.escape(title)}</title><style>{CSS}</style></head>
 <body>
 {body}
-<div class="bar"><button id="save">Save answers</button><span id="status"></span></div>
+<div class="bar"><button id="save">Save answers to continue</button><span id="status"></span></div>
 <script>{JS}</script>
 </body></html>
 """

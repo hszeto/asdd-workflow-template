@@ -9,6 +9,16 @@ Follow the `asdd` skill's phase structure. This command covers **Phase 3
 (Implement)** through **Phase 6 (Manual Test Instructions)**. It does not write
 commit messages — that is `/commit-message`, Phase 7.
 
+## 0. Check the plan review page was saved
+
+Before anything else, check for an unsaved review:
+
+- Run `ps -ax -o args= | grep -F "review.py serve" | grep -v grep`. If a line
+  names `ai/plans/<name>.html`, the review page is still waiting. Stop and tell
+  the user: "Click Save on the plan review page first."
+- If `ai/plans/<name>.answers.json` exists, the answers haven't been applied.
+  Stop and tell the user to run `apply` first.
+
 ## 1. Locate the approved plan
 
 `$ARGUMENTS` is a feature name, slug, or path identifying which plan to
