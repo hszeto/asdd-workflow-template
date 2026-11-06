@@ -17,7 +17,7 @@ from pathlib import Path
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-OPEN_QUESTIONS = "Open Questions"
+ANSWERABLE_SECTIONS = ("Open Questions", "Findings")
 MAX_ANSWER = 20000
 
 CHECK_RE = re.compile(r"^(\s*)- \[( |x|X)\] (.*)$")
@@ -36,21 +36,20 @@ pre{background:#f0f0f0;padding:12px;overflow-x:auto;border-radius:6px}
 .q{margin:14px 0;padding:12px;background:#fff;border:1px solid #e3e3e3;border-radius:8px}
 .q p{margin:0 0 8px;font-weight:600}
 textarea{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid #ccc;border-radius:6px;min-height:3em}
-.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px;background:#fff;border-top:1px solid #ddd}
-.bar button{font:inherit;padding:10px 18px;border-radius:6px;border:0;background:#1d1d1f;color:#fff;cursor:pointer}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px;background:#fff;border-top:1px solid #ddd;text-align:center}
+.bar button{font:inherit;font-weight:600;padding:10px 18px;border-radius:6px;border:0;background:#c62828;color:#fff;cursor:pointer}
 #status{margin-left:12px;color:#555}
 """
 
 JS = """
 document.getElementById('save').addEventListener('click', async () => {
-  const questions = {}, gates = {};
+  const questions = {};
   document.querySelectorAll('textarea[data-id]').forEach(t => questions[t.dataset.id] = t.value.trim());
-  document.querySelectorAll('input[data-id]').forEach(c => gates[c.dataset.id] = c.checked);
   const statusEl = document.getElementById('status');
   statusEl.textContent = 'Saving...';
   try {
     const r = await fetch('/submit', {method: 'POST', headers: {'Content-Type': 'application/json'},
-                                      body: JSON.stringify({questions, gates})});
+                                      body: JSON.stringify({questions})});
     statusEl.textContent = r.ok ? 'Saved. Go back to Claude Code.' : 'Save failed (' + r.status + ').';
   } catch (e) {
     statusEl.textContent = 'Save failed. Is the review server still running?';
@@ -68,7 +67,7 @@ def inline(text):
 def parse(lines):
     """Return blocks in document order. Each block records its source line index."""
     blocks, section, in_code, code = [], None, False, []
-    qn = gn = 0
+    qn = 0
     i = 0
     while i < len(lines):
         line = lines[i]
@@ -93,12 +92,12 @@ def parse(lines):
             i += 1
             continue
         if m := CHECK_RE.match(line):
-            gn += 1
-            blocks.append(("gate", f"G{gn}", m.group(3), m.group(2).lower() == "x", i))
+            mark = "☑" if m.group(2).lower() == "x" else "☐"
+            blocks.append(("li", f"{mark} {m.group(3)}"))
             i += 1
             continue
         if m := BULLET_RE.match(line):
-            if not m.group(1) and section == OPEN_QUESTIONS:
+            if not m.group(1) and section in ANSWERABLE_SECTIONS:
                 qn += 1
                 ans_idx, answer = None, ""
                 if i + 1 < len(lines) and (a := ANSWER_RE.match(lines[i + 1])):
@@ -137,15 +136,6 @@ def render_page(md_text, title_fallback):
             open_ul()
             out.append(f"<li>{inline(b[1])}</li>")
             continue
-        if kind == "gate":
-            open_ul()
-            _, gid, text, checked, _ = b
-            mark = " checked" if checked else ""
-            out.append(
-                f'<li class="gate"><label><input type="checkbox" data-id="{gid}"{mark}>'
-                f"{inline(text)}</label></li>"
-            )
-            continue
         close_ul()
         if kind == "h":
             out.append(f"<h{b[1]}>{inline(b[2])}</h{b[1]}>")
@@ -168,7 +158,7 @@ def render_page(md_text, title_fallback):
 <title>{html.escape(title)}</title><style>{CSS}</style></head>
 <body>
 {body}
-<div class="bar"><button id="save">Save answers</button><span id="status"></span></div>
+<div class="bar"><button id="save">Save answers to continue</button><span id="status"></span></div>
 <script>{JS}</script>
 </body></html>
 """
@@ -209,14 +199,12 @@ class ReviewHandler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
             questions = {k: str(v)[:MAX_ANSWER] for k, v in data["questions"].items()
                          if re.fullmatch(r"Q\d+", k)}
-            gates = {k: bool(v) for k, v in data["gates"].items() if re.fullmatch(r"G\d+", k)}
         except (KeyError, TypeError, ValueError):
             self.send_error(400)
             return
         payload = {
             "submitted_at": datetime.datetime.now().isoformat(timespec="seconds"),
             "questions": questions,
-            "gates": gates,
         }
         self.server.answers_path.write_text(json.dumps(payload, indent=2))
         body = b'{"ok": true}'
@@ -263,12 +251,6 @@ def cmd_apply(md_arg):
                 edits.append((ans_idx if ans_idx is not None else idx, "set", line, ans_idx is None))
             elif ans_idx is not None:
                 edits.append((ans_idx, "delete", None, False))
-        elif b[0] == "gate":
-            _, gid, _, _, idx = b
-            if gid in saved["gates"]:
-                mark = "x" if saved["gates"][gid] else " "
-                line = re.sub(r"\[( |x|X)\]", f"[{mark}]", lines[idx], count=1)
-                edits.append((idx, "set", line, False))
     for idx, action, line, insert in sorted(edits, key=lambda e: e[0], reverse=True):
         if action == "delete":
             del lines[idx]

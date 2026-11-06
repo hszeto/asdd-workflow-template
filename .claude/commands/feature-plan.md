@@ -8,14 +8,23 @@ argument-hint: feature-spec md file
 Follow the `asdd` skill's phase structure. This command covers **Phase 2 (Plan)**
 only. Do not begin implementation.
 
+## 0. Check the spec review page was saved
+
+Before anything else, check for an unsaved review:
+
+- Run `ps -ax -o args= | grep -F "review.py serve" | grep -v grep`. If a line
+  names `ai/feature-specs/<name>.html`, the review page is still waiting. Stop and
+  tell the user: "Click Save on the spec review page first."
+- If `ai/feature-specs/<name>.answers.json` exists, the answers haven't been
+  applied. Stop and tell the user to run `apply` first.
+
 ## 1. Locate the approved spec
 
 `$ARGUMENTS` is a feature name or note identifying which spec to plan for.
 Search `ai/feature-specs/` for a matching file.
 
-If no matching spec exists, or its **Spec approved** box under `## Approval` is
-not ticked, stop and tell the user — do not plan from an unapproved or invented
-spec.
+If no matching spec exists, stop and tell the user — do not plan from an
+invented spec.
 
 Before planning, re-read the spec's **Open Questions**. If any are unanswered —
 in the file and in this conversation — stop and ask. Do not plan on assumed
@@ -58,8 +67,11 @@ Use this template:
 - <path> — <what changes>
 
 ## Checkpoints
-1. <one commit-sized unit of work> → verify: <the check that proves it done>
-2. ...
+- [ ] 1. <one commit-sized unit of work> → verify: <the check that proves it done>
+- [ ] 2. ...
+
+Write every checkpoint unticked. `/feature-implement` ticks each one after the
+user confirms its commit.
 
 ## Test Plan
 - <specific test/case to add or run>
@@ -67,19 +79,25 @@ Use this template:
 
 ## Risks / Rollback
 - <risk> → <mitigation or how to undo>
-
-## Approval
-- [ ] Plan approved
 ```
 
 ## 4. Review page
 
-Follow the **Review page** steps in the `asdd` skill for `ai/plans/<name>.md`.
-Keep the chat reply short: the plan path, the review URL, and any open
+Resolve `REVIEW` first: `.claude/scripts/review.py` if this project has it,
+otherwise `~/.claude/scripts/review.py`. Then run these in Bash:
+
+1. `python3 $REVIEW render ai/plans/<name>.md`
+2. `python3 $REVIEW serve ai/plans/<name>.html --once`, in the background
+   (`run_in_background`).
+
+Do not write HTML yourself or publish an artifact. The page comes only from the
+script.
+
+Keep the chat reply short: the plan path, `http://127.0.0.1:8765/`, and any open
 questions.
 
 ## 5. Stop
 
-Wait for the review server to finish, then run the apply step from the `asdd`
-skill and summarize what changed. Do not begin implementation until **Plan
-approved** is ticked.
+When the server exits, run `python3 $REVIEW apply ai/plans/<name>.md` and
+summarize what changed. Do not begin implementation until the user
+runs `/feature-implement`.

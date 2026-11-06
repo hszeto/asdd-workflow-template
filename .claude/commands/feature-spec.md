@@ -1,5 +1,5 @@
 ---
-description: Phase 0 + Phase 1 of ASDD — orient in the codebase, then write a feature spec for approval.
+description: Phase 0 + Phase 1 of ASDD — orient in the codebase, then write a feature spec for review.
 argument-hint: Feature description
 ---
 
@@ -50,9 +50,6 @@ Use this template:
 
 ## Acceptance Criteria
 - <one line each, checkable as done/not done>
-
-## Approval
-- [ ] Spec approved
 ```
 
 If you have genuine ambiguity about requirements, put it in **Open Questions**
@@ -60,12 +57,21 @@ rather than guessing — do not invent acceptance criteria to fill the section.
 
 ## 3. Review page
 
-Follow the **Review page** steps in the `asdd` skill: render the page, then start
-the review server in the background. Keep the chat reply short: the spec path,
-the review URL, and the Open Questions count. Do not paste the spec into chat.
+Resolve `REVIEW` first: `.claude/scripts/review.py` if this project has it,
+otherwise `~/.claude/scripts/review.py`. Then run these in Bash:
+
+1. `python3 $REVIEW render ai/feature-specs/<name>.md`
+2. `python3 $REVIEW serve ai/feature-specs/<name>.html --once`, in the background
+   (`run_in_background`).
+
+Do not write HTML yourself or publish an artifact. The page comes only from the
+script.
+
+Keep the chat reply short: the spec path, `http://127.0.0.1:8765/`, and the Open
+Questions count. Do not paste the spec into chat.
 
 ## 4. Stop
 
-Wait for the review server to finish. When it does, run the apply step from the
-`asdd` skill, then summarize what changed and what is still open. Do not run
-`/feature-plan` automatically — it runs only after **Spec approved** is ticked.
+When the server exits, run `python3 $REVIEW apply ai/feature-specs/<name>.md`,
+then summarize what changed and what is still open. Do not run
+`/feature-plan` automatically — you run it when you're satisfied with the spec.

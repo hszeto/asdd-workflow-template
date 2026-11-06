@@ -14,6 +14,7 @@ project needs its own variant (see below).
 │   ├── feature-spec.md      # Phase 0 + 1 — orient, then write a spec
 │   ├── feature-plan.md      # Phase 2 — research, then write a plan
 │   ├── feature-implement.md # Phases 3-6 — build it, one checkpoint at a time
+│   ├── feature-implementation-review.md # optional — review the whole feature diff
 │   └── commit-message.md    # Phase 7 — commit message, summary, PR description
 ├── scripts/review.py        # renders spec/plan as an HTML review page, saves answers
 └── skills/asdd/SKILL.md     # phase structure + principles
@@ -70,15 +71,15 @@ deliberate — it keeps startup context small.
 /feature-spec <req>   → loads SKILL.md + feature-spec.md
                       → reads CLAUDE.md context already in scope
                       → writes ai/feature-specs/<name>.md + .html
-                      → starts the review server, prints the URL   ⏸ APPROVAL
+                      → starts the review server, prints the URL   ⏸ you
 
-  you answer Open Questions and tick "Spec approved" on the page
+  you answer Open Questions on the page, then click Save
   Claude folds the answers into the markdown and re-renders the page
 
 /feature-plan <name>  → re-reads the spec, promotes answers to
                         Resolved Decisions, researches the code
                       → writes ai/plans/<name>.md + .html
-                      → starts the review server, prints the URL   ⏸ APPROVAL
+                      → starts the review server, prints the URL   ⏸ you
 
 /feature-implement    → checks the branch (hook also fires on first edit)
                       → checkpoint 1 → verify → report → ⏸ you commit
@@ -89,22 +90,26 @@ deliberate — it keeps startup context small.
                       → you run the commit
 ```
 
-The ⏸ marks are where Claude stops and you act. There are only two kinds: the
-two approval gates, and one per checkpoint for the commit.
+The ⏸ marks are where Claude stops and you act: answering questions, running the
+next command, and committing each checkpoint.
 
 ## The workflow
 
 1. `/feature-spec <requirement>` → writes `ai/feature-specs/<name>.md`, parking
    any genuine ambiguity in **Open Questions** rather than guessing at it, and
-   opens the review page. **Stop for approval.**
-2. On the review page, answer the Open Questions and tick **Spec approved**,
-   then click Save. Claude folds the answers into the markdown under each
-   question and re-renders the page.
+   opens the review page. **Stop.**
+2. On the review page, answer the Open Questions, then click Save. Claude folds
+   the answers into the markdown under each question and re-renders the page.
 3. `/feature-plan <name>` → promotes those answers to **Resolved Decisions** in
    the spec, then writes `ai/plans/<name>.md` and opens its review page. Refuses
-   to plan on assumed answers or an unticked spec. **Stop for approval.**
+   to plan while any question is unanswered. Running it is your go-ahead.
 4. `/feature-implement <name>` → builds it **one checkpoint at a time**, stopping
    after each so you can commit before the next begins.
+   - Optional: `/feature-implementation-review <name>` → reviews the whole feature
+     diff against the spec, plan, and contract, and opens a review page of findings
+     you mark `fix` or `skip`. It needs at least one ticked checkpoint, and it
+     doesn't make any fixes. The review itself runs in a subagent on a higher-grade
+     model (Opus), so your main session stays on its own, cheaper model.
 5. Self-verify — tests, lint, build must be green (or explicitly note what
    tooling doesn't exist).
 6. Update whatever docs the repo already has — a changelog entry if it keeps
@@ -113,8 +118,8 @@ two approval gates, and one per checkpoint for the commit.
 7. Give manual test instructions.
 8. `/commit-message` → commit message, summary, PR description.
 
-Approval gates after steps 1 and 3 are non-negotiable. No implementation
-starts without sign-off on both the spec and the plan.
+Planning never starts on a spec with open questions, and implementation never
+starts without a plan file. Running each command is your go-ahead.
 
 **Git stays in your hands.** The workflow never creates, switches or deletes
 branches and never commits — checkpoints are commit-sized units of work that get
@@ -144,7 +149,7 @@ The `.html` review pages and `.answers.json` files are generated and local, so
 ## The review page
 
 Specs and plans open as a simple HTML page with text boxes for Open Questions
-and checkboxes for approval. Start it from the spec or plan command, and it
+and the checkpoints shown read-only. Start it from the spec or plan command, and it
 runs on `127.0.0.1:8765` only. Nothing leaves the machine.
 
 When you click **Save answers**, the server writes `<name>.answers.json` and

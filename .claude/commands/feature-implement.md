@@ -9,7 +9,15 @@ Follow the `asdd` skill's phase structure. This command covers **Phase 3
 (Implement)** through **Phase 6 (Manual Test Instructions)**. It does not write
 commit messages — that is `/commit-message`, Phase 7.
 
-Invoking this command **is** the user's approval of the plan. Do not ask again.
+## 0. Check the plan review page was saved
+
+Before anything else, check for an unsaved review:
+
+- Run `ps -ax -o args= | grep -F "review.py serve" | grep -v grep`. If a line
+  names `ai/plans/<name>.html`, the review page is still waiting. Stop and tell
+  the user: "Click Save on the plan review page first."
+- If `ai/plans/<name>.answers.json` exists, the answers haven't been applied.
+  Stop and tell the user to run `apply` first.
 
 ## 1. Locate the approved plan
 
@@ -18,6 +26,10 @@ implement. Search `ai/plans/` for a matching file.
 
 If no matching plan exists, stop and tell the user — do not implement from a
 spec alone, and never from an invented plan.
+
+Running this command is the user's go-ahead to implement, so do not ask for
+approval again in chat. If the plan has no checkpoints, stop and tell the user
+to run `/feature-plan` first.
 
 **Confirm it is a plan, not a spec.** These are easy to conflate — same slug,
 adjacent directories. A plan lives in `ai/plans/` and its first line is
@@ -58,12 +70,18 @@ needed — agreeing it should exist is not permission for you to create it.
 
 ## 3. Implement ONE checkpoint, then stop
 
-Work through the plan's checkpoints **one at a time, in order**. After each:
+Start at the **first unticked** checkpoint (`- [ ]`) in the plan. Checkpoints
+already ticked (`- [x]`) were committed in an earlier run: don't redo them. If
+every checkpoint is ticked, say so and stop.
+
+Work through the checkpoints **one at a time, in order**. After each:
 
 1. Run that checkpoint's verification gates from the plan's Test Plan.
 2. Report what changed, what passed, and what the gates do *not* cover.
 3. Provide the commit message for that checkpoint.
 4. **Stop and wait.** The user commits before the next checkpoint begins.
+5. When the user confirms the commit, tick that checkpoint in the plan
+   (`- [ ]` → `- [x]`). Do not tick it before they confirm.
 
 Do not start checkpoint N+1 until the user says to. Running checkpoints
 back-to-back leaves both sets of changes in one working tree and destroys the
